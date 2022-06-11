@@ -75,6 +75,7 @@ public class PlayerMove : MonoBehaviour
             //playerAController.SetBool(Run, false);
             Destroy(rb);
             GetComponent<CapsuleCollider>().enabled = false;
+            GetComponent<PlayerMove>().enabled = false;
         }
     }
 
