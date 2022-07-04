@@ -92,6 +92,7 @@ public class PlayerMove : MonoBehaviour, IShooter
     private void Die()
     {
         myAnim.SetBool("Death_b", true);
+        StartCoroutine(ExecuteAfterTime(2f));
     }
 
     public void SetBool()
@@ -115,6 +116,12 @@ public class PlayerMove : MonoBehaviour, IShooter
             UiManager.instance.resBar.transform.localScale = new Vector3(resourceGauge / 30.30f, 1f, 1f);
             //print(resourceGauge);
         }
+    }
+
+    IEnumerator ExecuteAfterTime(float time)
+    {
+        yield return new WaitForSeconds(time);
+        UiManager.instance.GameOver();
     }
 
 
