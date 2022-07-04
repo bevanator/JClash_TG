@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CollisionCheck : MonoBehaviour
 {
-
+    public GameObject resource;
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag($"upperBar"))
@@ -14,7 +14,7 @@ public class CollisionCheck : MonoBehaviour
         }
         if (other.gameObject.CompareTag($"enemy"))
         {
-            //print("hit");
+            Instantiate(resource, other.transform.position, Quaternion.identity);
             Destroy(this.gameObject);
         }
     }

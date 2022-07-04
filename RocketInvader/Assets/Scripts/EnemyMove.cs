@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class EnemyMove : MonoBehaviour
+public class EnemyMove : MonoBehaviour, IShooter
 {
     private float speed = 10f;
+    [SerializeField] [Range(0,1)] float hoverSpeed = 1f;
+    [SerializeField] [Range(0,100)] float range = 1f; 
     private Vector3 dir = Vector3.right;
     public float Lmax = -10f;
     public float Rmax = 15f;
@@ -15,20 +17,25 @@ public class EnemyMove : MonoBehaviour
     public float descentSpeed = 3f;
     public float shootFreq = 2f;
     public GameObject enemyBullet;
+    public GameObject resource;
     public float shootForce = -50f;
     public bool shoot;
     public float fireRate = 0.5f;
     private float nextFire = 0f;
+    private bool isDestroyed;
+    public bool isSine;
     [SerializeField] public Invader invaderData;
     
     // Start is called before the first frame update
     void Start()
     {
         InvokeRepeating(nameof(Descent), descentSpeed, descentSpeed);
-        InvokeRepeating(nameof(Shoot), Random.Range(1f, 3f), Random.Range(1f, 3f));
-        //fireRate = invaderData.fireRate;
+
+        fireRate = invaderData.fireRate;
+        speed = invaderData.speed/10f;
     }
 
+    
     // Update is called once per frame
     void Update()
     {
@@ -52,6 +59,13 @@ public class EnemyMove : MonoBehaviour
         {
             dir = Vector3.left;
         }
+        float y = Mathf.PingPong(Time.time * hoverSpeed, 1) * range;
+        if (isSine)
+        {
+            print(y);
+            transform.localPosition += new Vector3(0f, y, 0f);
+        }
+        
     }
     
     private void OnTriggerEnter(Collider other)
@@ -60,6 +74,11 @@ public class EnemyMove : MonoBehaviour
         {
             health -= 20f;
             Destroy(this.gameObject);
+        }
+        
+        if (other.gameObject.CompareTag($"safeZone"))
+        {
+            UiManager.instance.GameOver();
         }
     }
 
@@ -78,4 +97,5 @@ public class EnemyMove : MonoBehaviour
         }
 
     }
+
 }

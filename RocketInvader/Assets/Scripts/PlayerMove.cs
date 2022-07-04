@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMove : MonoBehaviour
+public class PlayerMove : MonoBehaviour, IShooter
 {
 
     private float horizontalMove;
@@ -22,9 +22,14 @@ public class PlayerMove : MonoBehaviour
     private bool shoot;
     public float fireRate = 0.5f;
     private float nextFire = 0f;
+    private float resourceGauge;
+    private Vector3 targetRot;
+    private Quaternion rotateToQ;
+    
     // Start is called before the first frame update
     void Start()
     {
+        resourceGauge = 0;
         shoot = false;
         horizontalMove = 0f;
     }
@@ -32,12 +37,17 @@ public class PlayerMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        targetRot = new Vector3(horizontalMove, 0f, 1.0f);
+        rotateToQ = Quaternion.LookRotation(targetRot);
+        
         horizontalMove = Input.GetAxis("Horizontal");
         if (moveJstick.Horizontal >= 0.02f) horizontalMove = 1f;
         else if (moveJstick.Horizontal <= -0.02f) horizontalMove = -1f;
         else horizontalMove = 0f; 
+        
         myAnim.SetFloat(SpeedF, Math.Abs(horizontalMove));
         transform.position += new Vector3(horizontalMove * speed * Time.deltaTime, 0f, 0f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotateToQ, speed * Time.deltaTime);
         if(aimJstick.Horizontal!=0f) Aim();
         else
         {
@@ -93,6 +103,18 @@ public class PlayerMove : MonoBehaviour
     {
         shoot = false;
         
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag($"resource"))
+        {
+            //print("hit");
+            if(resourceGauge<100f) resourceGauge += 5f;
+            Destroy(other.gameObject);
+            UiManager.instance.resBar.transform.localScale = new Vector3(resourceGauge / 30.30f, 1f, 1f);
+            //print(resourceGauge);
+        }
     }
 
 
